@@ -1,9 +1,10 @@
-/* function polling() {
-  // console.log("polling");
-  setTimeout(polling, 1000 * 30);
-}
-
-polling(); */
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  console.log("ACTIVATE", activeInfo);
+  chrome.scripting.executeScript({
+    target: { tabId: activeInfo.tabId },
+    files: ['js/content_script.js']
+  });
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.elements) {

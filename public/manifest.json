@@ -11,7 +11,6 @@
 
   "action": {
     "default_icon": "images/icon-128.png",
-
     "default_popup": "popup.html"
   },
 
@@ -31,7 +30,7 @@
     "service_worker": "js/background.js"
   },
 
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
 
   "host_permissions": ["<all_urls>"]
 }

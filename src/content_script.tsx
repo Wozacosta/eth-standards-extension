@@ -10,8 +10,7 @@ const ercEipElements = Array.from(textElements).filter((el) => {
 const elements = Array.from(ercEipElements)
   .filter((el) => {
     return (
-      el.children.length === 0 &&
-      el.textContent?.match(/(ERC|EIP)-?\d{1,6}/i)
+      el.children.length === 0 && el.textContent?.match(/(ERC|EIP)-?\d{1,6}/i)
     );
   })
   .map((el) => {
@@ -23,19 +22,33 @@ const elements = Array.from(ercEipElements)
     }
   });
 
-  chrome.runtime.sendMessage({ elements: elements });
+chrome.runtime.sendMessage({ elements: elements });
+console.log("SETTING STORAGE")
+localStorage.setItem("ethStandards-itemsInPage", JSON.stringify(elements));
+
+/*
+* The popup cannot directly access the content script, so we need to use the background script as a mediator.
+*/
+console.log("CREATEING LISTENER")
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("RECEIVED MESSAGE", request);
+  if (request.action === "getElements") {
+    const elements = JSON.parse(localStorage.getItem("ethStandards-itemsInPage") || "[]");
+    sendResponse({ elements });
+  }
+});
+
 
 const knownItems = JSON.parse(
   localStorage.getItem("ethStandards-knownItems") || "[]"
 );
-console.log({knownItems})
-
+console.log({ knownItems });
 
 ercEipElements.forEach((el) => {
   const innerHTML = el.innerHTML;
   const highlightedHTML = innerHTML.replace(/(ERC|EIP)-?\d{1,6}/g, (match) => {
     const isKnown = knownItems.includes(match);
-    const backgroundColor = isKnown ? "green" : "yellow";
+    const backgroundColor = isKnown ? "green" : "yellow";      
     return `<span class="highlighted" style="background-color: ${backgroundColor}; color: black;">${match}</span>`;
   });
   el.innerHTML = highlightedHTML;
@@ -103,7 +116,10 @@ highlightedElements.forEach((el) => {
           localStorage.getItem("ethStandards-knownItems") || "[]"
         );
         knownItems.push(`${capitalizedType}-${number}`);
-        localStorage.setItem("ethStandards-knownItems", JSON.stringify(knownItems));
+        localStorage.setItem(
+          "ethStandards-knownItems",
+          JSON.stringify(knownItems)
+        );
         popup.remove();
       });
 

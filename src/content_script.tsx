@@ -41,19 +41,22 @@ const highlightedElements = document.querySelectorAll(".highlighted");
 
 highlightedElements.forEach(el => {
   el.addEventListener("click", (event) => {
-    const match = el.textContent?.match(/(ERC|EIP)-?\d{1,6}/);
+    event.stopPropagation(); // Prevent event bubbling NOTE: doenst work
+    const match = el.textContent?.match(/(ERC|EIP)-?(\d{1,6})/i);
     if (match) {
-      const [fullMatch, type, number] = match[0].split(/-|(\d+)/);
-      const link = type === "ERC"
+      const [fullMatch, type, number] = match;
+      console.log({match, fullMatch, type, number});
+      const capitalizedType = type.toUpperCase();
+      const link = capitalizedType === "ERC"
         ? `https://github.com/ethereum/ERCs/blob/master/ERCS/erc-${number}.md`
         : `https://github.com/ethereum/EIPs/blob/master/EIPS/eip-${number}.md`;
 
       const popup = document.createElement("div");
       popup.innerHTML = `
-      This is a highlighted ${type} standard. 
-      <a href="${link}" target="_blank">View Document</a>
-      <button id="close-popup" style="margin-left: 10px;">Close</button>
-    `;
+        This is a highlighted ${capitalizedType} standard. 
+        <a href="${link}" target="_blank">View Document</a>
+        <button id="close-popup" style="margin-left: 10px;">Close</button>
+      `;;
       popup.style.position = "absolute";
       popup.style.backgroundColor = "white";
       popup.style.border = "1px solid black";

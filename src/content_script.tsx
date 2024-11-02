@@ -7,6 +7,24 @@ const ercEipElements = Array.from(textElements).filter((el) => {
   );
 });
 
+const elements = Array.from(ercEipElements)
+  .filter((el) => {
+    return (
+      el.children.length === 0 &&
+      el.textContent?.match(/(ERC|EIP)-?\d{1,6}/i)
+    );
+  })
+  .map((el) => {
+    const match = el.textContent?.match(/(ERC|EIP)-?(\d{1,6})/i);
+    if (match) {
+      const [fullMatch, type, number] = match;
+      const capitalizedType = type.toUpperCase();
+      return `${capitalizedType}-${number}`;
+    }
+  });
+
+  chrome.runtime.sendMessage({ elements: elements });
+
 const knownItems = JSON.parse(
   localStorage.getItem("ethStandards-knownItems") || "[]"
 );

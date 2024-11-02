@@ -23,15 +23,12 @@ const elements = Array.from(ercEipElements)
   });
 
 chrome.runtime.sendMessage({ elements: elements });
-console.log("SETTING STORAGE")
 localStorage.setItem("ethStandards-itemsInPage", JSON.stringify(elements));
 
 /*
 * The popup cannot directly access the content script, so we need to use the background script as a mediator.
 */
-console.log("CREATEING LISTENER")
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("RECEIVED MESSAGE", request);
   if (request.action === "getElements") {
     const elements = JSON.parse(localStorage.getItem("ethStandards-itemsInPage") || "[]");
     sendResponse({ elements });
@@ -42,7 +39,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 const knownItems = JSON.parse(
   localStorage.getItem("ethStandards-knownItems") || "[]"
 );
-console.log({ knownItems });
 
 ercEipElements.forEach((el) => {
   const innerHTML = el.innerHTML;
